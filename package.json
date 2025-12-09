@@ -1,0 +1,28 @@
+{
+  "name": "moveit2",
+  "displayName": "Moveit2",
+  "description": "snippets for moveit2 and moveit task constructor",
+  "version": "0.0.1",
+  "icon": "images/icon.png",
+  "publisher": "logesh1516",
+  "keywords": [
+    "moveit",
+    "moveit2",
+    "mtc",
+    "moveit task constructor"
+  ],
+  "engines": {
+    "vscode": "^1.106.1"
+  },
+  "categories": [
+    "Snippets"
+  ],
+  "contributes": {
+    "snippets": [
+      {
+        "language": "cpp",
+        "path": "./snippets/snippets.code-snippets"
+      }
+    ]
+  }
+}

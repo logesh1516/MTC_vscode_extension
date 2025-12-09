@@ -1,0 +1,237 @@
+{
+  "Fixed state": {
+    "prefix": "mtc_fixedstate",
+    "body": [
+      "{",
+      "\tauto ${1:stage} = std::make_unique<stages::FixedState>(\"${2:stage_name}\");",
+      "\t${1:stage}->setState(${3:scene});",
+      "\t${4:t}.add(std::move(${1:stage}));",
+      "}",
+      "$0"
+    ],
+    "description": "MTC FixedState Snippet - generator"
+  },
+  "Current state": {
+    "prefix": "mtc_currentstate",
+    "body": [
+      "{",
+      "\tauto ${1:stage} = std::make_unique<stages::CurrentState>(\"${2:stage_name}\");",
+      "\t${4:t}.add(std::move(${1:stage}));",
+      "}",
+      "$0"
+    ],
+    "description": "MTC CurrentState Snippet - generator"
+  },
+  "Connect": {
+    "prefix": "mtc_connect",
+    "body": [
+      "{",
+      "\tauto ${1:connect} = std::make_unique<stages::Connect>(\"${2:connect}\", stages::Connect::GroupPlannerVector{ { \"${3:planning_group}\", ${4:planner} } });",
+      "\t${5:t}.add(std::move(${1:connect}));",
+      "}",
+      "$0"
+    ],
+    "description": "MTC Connect Snippet - connector"
+  },
+  "try_and_catch": {
+    "prefix": "mtc_publish_solution",
+    "body": [
+      "try {",
+      "\t${1:t}.init();",
+      "\tif (${1:t}.plan() && !${1:t}.solutions().empty()) {",
+      "\t\t${1:t}.introspection().publishSolution(*${1:t}.solutions().front());",
+      "\t} else {",
+      "\t\tstd::cerr << \"Planning failed or no solution found!\" << std::endl;",
+      "\t}",
+      "} catch (const InitStageException& e) {",
+      "\tstd::cerr << \"Initialization error: \" << e << std::endl;",
+      "}",
+      "$0"
+    ],
+    "description": "Moveit2 Solution snippet to publish the solution"
+  },
+  "Move_Relative linear": {
+    "prefix": "mtc_moverelative_linear",
+    "body": [
+      "{",
+      "\tauto ${1:stage} = std::make_unique<stages::MoveRelative>(\"${2:Relative}\", ${3:planner});",
+      "\t${1:stage}->setGroup(${4:planning_group});",
+      "\tgeometry_msgs::msg::Vector3Stamped ${5:direction};",
+      "\t${5:direction}.header.frame_id = \"${6:planning_frame}\";",
+      "\t${5:direction}.vector.${7:x|y|z} = ${8:value};",
+      "\t${1:stage}->setDirection(${5:direction});",
+      "\t${9:t}.add(std::move(${1:stage}));",
+      "}",
+      "$0"
+    ],
+    "description": "MTC MoveRelative linear Snippet - propagator"
+  },
+  "Move_Relative angular": {
+    "prefix": "mtc_moverelative_angular",
+    "body": [
+      "{",
+      "\tauto ${1:stage} = std::make_unique<stages::MoveRelative>(\"${2:Relative}\", ${3:planner});",
+      "\t${1:stage}->setGroup(${4:planning_group});",
+      "\tgeometry_msgs::msg::TwistStamped ${5:Twist};",
+      "\t${5:Twist}.header.frame_id = \"${6:planning_frame}\";",
+      "\t${5:Twist}.twist.angular.${7:x|y|z} = ${8:value};",
+      "\t${1:stage}->setDirection(${5:Twist});",
+      "\t${9:t}.add(std::move(${1:stage}));",
+      "}",
+      "$0"
+    ],
+    "description": "MTC MoveRelative angular Snippet - propagator"
+  },
+  "Move_to": {
+    "prefix": "mtc_moveto_pose",
+    "body": [
+      "{",
+      "\tauto ${1:stage} = std::make_unique<stages::MoveTo>(\"${2:MoveTo}\", ${3:planner});",
+      "\t${1:stage}->setGroup(${4:planning_group});",
+      "\tgeometry_msgs::msg::PoseStamped ${5:Pose};",
+      "\t${5:Pose}.header.frame_id = \"${6:planning_frame}\";",
+      "\t${5:Pose}.pose.orientation.w = ${7:1.0};",
+      "\t${5:Pose}.pose.position.x = ${8:x_value};",
+      "\t${5:Pose}.pose.position.y = ${9:y_value};",
+      "\t${5:Pose}.pose.position.x = ${10:z_value};",
+      "\t${1:stage}->setGoal(${5:Pose});",
+      "\t${11:t}.add(std::move(${1:stage}));",
+      "}",
+      "$0"
+    ],
+    "description": "MTC Moveto pose Snippet - propagator"
+  },
+  "Planner": {
+    "prefix": "mtc_planner",
+    "body": [
+      "auto ${1:planner} = std::make_shared<solvers::${2}>(${3});",
+      "$0"
+    ],
+    "description": "MTC Planner Snippet . Note:= Use node as args when using pipeline planner"
+  },
+  "Assert Model": {
+    "prefix": "mtc_assert",
+    "body": [
+      " assert(${1:t}.getRobotModel()->getName() == \"${2:robot_name}\");",
+      "$0"
+    ],
+    "description": "To assert the imported model"
+  },
+  "Moveit primitive Collison": {
+    "prefix": "moveit_primitive_collison",
+    "body": [
+      "moveit_msgs::msg::CollisionObject ${1:collision_object};",
+      "${1:collision_object}.header.frame_id = move_group_interface.getPlanningFrame();",
+      "${1:collision_object}.id = \"${2:primitive}\";",
+      "",
+      "shape_msgs::msg::SolidPrimitive ${2:primitive};",
+      "${2:primitive}.type = shape_msgs::msg::SolidPrimitive::${3};",
+      "${2:primitive}.dimensions.resize(${4});",
+      "${2:primitive}.dimensions[shape_msgs::msg::SolidPrimitive::${5}] = ${6:dimension_value};",
+      "",
+      "geometry_msgs::msg::Pose pose;",
+      "pose.position.x = ${7:x};",
+      "pose.position.y = ${8:y};",
+      "pose.position.z = ${9:z};",
+      "",
+      "${1:collision_object}.primitives.push_back(${2:primitive});",
+      "${1:collision_object}.primitive_poses.push_back(pose);",
+      "",
+      "${1:collision_object}.operation = moveit_msgs::msg::CollisionObject::ADD;",
+      "$0"
+    ],
+    "description": "moveit_primitive_collison"
+  },
+  "Moveit MoveTo poses": {
+    "prefix": "mtc_moveto_goal",
+    "body": [
+      "{",
+      "\tauto ${1:stage} = std::make_unique<stages::MoveTo>(\"${2:MoveTo}\", ${3:planner});",
+      "\t${1:stage}->setGroup(\"${4:group_name}\");",
+      "\t${1:stage}->setGoal(\"${5:goal_pose}\");",
+      "\tt.add(std::move(${1:stage}));",
+      "}",
+      "$0"
+    ],
+    "description": "MTC moveto between 2 poses Snippet - propagator"
+  },
+  "Moveit PredicateFilter": {
+    "prefix": "mtc_predicate_filter",
+    "body": [
+      "auto ${1:predicate_filter} = std::make_unique<stages::PredicateFilter>(\"${2:condition_check}\", std::move(${3:stage}));",
+      "${1:predicate_filter}->setPredicate([&${4}](const SolutionBase& s, std::string& comment) ",
+      "{",
+      "\t${5}",
+      "return true;",
+      "});",
+      "$0"
+    ],
+    "description": "MTC moveto between 2 poses Snippet - filter"
+  },
+  "Moveit ComputeIK": {
+    "prefix": "mtc_computeik",
+    "body": [
+      "auto ${1:ik} = std::make_unique<stages::ComputeIK>(${2});",
+      "${1:ik}->setGroup(\"${3:planning_group}\");",
+      "${1:ik}->insert(std::move(${4:parent_stage}));",
+      "${1:ik}->setTargetPose(Eigen::Translation3d(${5:t_x},${6:t_y},${7:t_z})*Eigen::AngleAxisd(${8:M_PI}, Eigen::Vector3d::${9}));",
+      "${1:ik}->setTimeout(${10:1.0});",
+      "${1:ik}->setMaxIKSolutions(${11:no_of_solutions});",
+      "${12:t}.add(std::move(${1:ik}));",
+      "$0"
+    ],
+    "description": "mtc computeik - wrapper"
+  },
+  "Moveit GenerateGraspPose": {
+    "prefix": "mtc_generate_grasp_pose",
+    "body": [
+      "{",
+      "\tauto ${1:grasp} = std::make_unique<stages::GenerateGraspPose>(\"${2:stage_name}\");",
+      "\t${1:grasp}->setPreGraspPose(\"${3:open}\");",
+      "\t${1:grasp}->setGraspPose(\"${4:close}\");",
+      "\t${1:grasp}->setRotationAxis(Eigen::Vector3d::${5});",
+      "\t${1:grasp}->setAngleDelta(${6});",
+      "\t${1:grasp}->setEndEffector(\"${7:hand}\");",
+      "\t${1:grasp}->setObject(\"${8}\");",
+      "\t${1:grasp}->setMonitoredStage(${9});",
+      "\t${10:t}.add(std::move(${1:grasp}));",
+      "}",
+      "$0"
+    ],
+    "description": "mtc computeik - wrapper"
+  },
+  "Ros2 ParamListener": {
+    "prefix": "ros2_paramlistener",
+    "body": [
+      "const auto ${1:param_listener} = std::make_shared<${2:paramter_name}::ParamListener>(node);",
+      "const auto ${3:params} = ${1:param_listener}->get_params();",
+      "$0"
+    ],
+    "description": "Paramter listener"
+  },
+  "Ros2 SingleExecutor": {
+    "prefix": "ros2_single_executor",
+    "body": [
+      "rclcpp::executors::SingleThreadedExecutor ${1:executor};",
+      "${1:executor}.add_node(${2:node});",
+      "auto ${3:spinner} = std::thread([&${1:executor}] { ${1:executor}.spin(); });",
+      "",
+      "${4}",
+      "spinner.join();",
+      "rclcpp::shutdown();",
+      "$0"
+    ],
+    "description": "SingleExecutor"
+  },
+  "Ros2 Transformation Matrix": {
+    "prefix": "ros2_transformation_matrix",
+    "body": [
+      "Eigen::Translation3d(${1},${2},${3}) *",
+      "Eigen::AngleAxisd(${4}, Eigen::Vector3d::UnitX()) *",
+      "Eigen::AngleAxisd(${5}, Eigen::Vector3d::UnitY()) *",
+      "Eigen::AngleAxisd(${6}, Eigen::Vector3d::UnitZ())",
+      "$0"
+    ],
+    "description": "ros2_transformation_matrix"
+  }
+}
