@@ -1,0 +1,840 @@
+{
+  "MoveIt2 MoveGroupInterface": {
+    "prefix": "moveit2_movegroupinterface",
+    "body": [
+      "moveit::planning_interface::MoveGroupInterface ${1:move_group_interface}(${2:node}, \"${3:planning_group}\");",
+      "$0"
+    ],
+    "description": "MoveIt2 MoveGroupInterface initialization"
+  },
+  "MoveIt2 PlanningSceneInterface": {
+    "prefix": "moveit2_planningsceneinterface",
+    "body": [
+      "moveit::planning_interface::PlanningSceneInterface ${1:planning_scene_interface};",
+      "$0"
+    ],
+    "description": "MoveIt2 PlanningSceneInterface initialization"
+  },
+  "MoveIt2 Set Target Pose": {
+    "prefix": "moveit2_set_target_pose",
+    "body": [
+      "geometry_msgs::msg::Pose ${1:target_pose};",
+      "${1:target_pose}.orientation.w = ${2:1.0};",
+      "${1:target_pose}.position.x = ${3:x_value};",
+      "${1:target_pose}.position.y = ${4:y_value};",
+      "${1:target_pose}.position.z = ${5:z_value};",
+      "${6:move_group_interface}.setPoseTarget(${1:target_pose});",
+      "$0"
+    ],
+    "description": "MoveIt2 set target pose for planning"
+  },
+  "MoveIt2 Plan and Execute": {
+    "prefix": "moveit2_plan_execute",
+    "body": [
+      "moveit::planning_interface::MoveGroupInterface::Plan ${1:plan};",
+      "bool ${2:success} = (${3:move_group_interface}.plan(${1:plan}) == moveit::core::MoveItErrorCode::SUCCESS);",
+      "if (${2:success}) {",
+      "\t${3:move_group_interface}.execute(${1:plan});",
+      "\tRCLCPP_INFO(${4:logger}, \"Plan executed successfully\");",
+      "} else {",
+      "\tRCLCPP_ERROR(${4:logger}, \"Planning failed\");",
+      "}",
+      "$0"
+    ],
+    "description": "MoveIt2 plan and execute motion"
+  },
+  "MoveIt2 Set Joint Target": {
+    "prefix": "moveit2_set_joint_target",
+    "body": [
+      "std::vector<double> ${1:joint_values} = {${2:joint_values}};",
+      "${3:move_group_interface}.setJointValueTarget(${1:joint_values});",
+      "$0"
+    ],
+    "description": "MoveIt2 set joint value target"
+  },
+  "MoveIt2 Set Named Target": {
+    "prefix": "moveit2_set_named_target",
+    "body": [
+      "${1:move_group_interface}.setNamedTarget(\"${2:target_name}\");",
+      "$0"
+    ],
+    "description": "MoveIt2 set named target (from SRDF)"
+  },
+  "MoveIt2 Add Box Collision Object": {
+    "prefix": "moveit2_add_box_collision",
+    "body": [
+      "moveit_msgs::msg::CollisionObject ${1:collision_object};",
+      "${1:collision_object}.header.frame_id = ${2:move_group_interface}.getPlanningFrame();",
+      "${1:collision_object}.id = \"${3:box_name}\";",
+      "",
+      "shape_msgs::msg::SolidPrimitive ${4:primitive};",
+      "${4:primitive}.type = shape_msgs::msg::SolidPrimitive::BOX;",
+      "${4:primitive}.dimensions.resize(3);",
+      "${4:primitive}.dimensions[shape_msgs::msg::SolidPrimitive::BOX_X] = ${5:x_dim};",
+      "${4:primitive}.dimensions[shape_msgs::msg::SolidPrimitive::BOX_Y] = ${6:y_dim};",
+      "${4:primitive}.dimensions[shape_msgs::msg::SolidPrimitive::BOX_Z] = ${7:z_dim};",
+      "",
+      "geometry_msgs::msg::Pose ${8:box_pose};",
+      "${8:box_pose}.orientation.w = 1.0;",
+      "${8:box_pose}.position.x = ${9:x};",
+      "${8:box_pose}.position.y = ${10:y};",
+      "${8:box_pose}.position.z = ${11:z};",
+      "",
+      "${1:collision_object}.primitives.push_back(${4:primitive});",
+      "${1:collision_object}.primitive_poses.push_back(${8:box_pose});",
+      "${1:collision_object}.operation = moveit_msgs::msg::CollisionObject::ADD;",
+      "",
+      "${12:planning_scene_interface}.applyCollisionObject(${1:collision_object});",
+      "$0"
+    ],
+    "description": "MoveIt2 add box collision object to planning scene"
+  },
+  "MoveIt2 Add Sphere Collision Object": {
+    "prefix": "moveit2_add_sphere_collision",
+    "body": [
+      "moveit_msgs::msg::CollisionObject ${1:collision_object};",
+      "${1:collision_object}.header.frame_id = ${2:move_group_interface}.getPlanningFrame();",
+      "${1:collision_object}.id = \"${3:sphere_name}\";",
+      "",
+      "shape_msgs::msg::SolidPrimitive ${4:primitive};",
+      "${4:primitive}.type = shape_msgs::msg::SolidPrimitive::SPHERE;",
+      "${4:primitive}.dimensions.resize(1);",
+      "${4:primitive}.dimensions[shape_msgs::msg::SolidPrimitive::SPHERE_RADIUS] = ${5:radius};",
+      "",
+      "geometry_msgs::msg::Pose ${6:sphere_pose};",
+      "${6:sphere_pose}.orientation.w = 1.0;",
+      "${6:sphere_pose}.position.x = ${7:x};",
+      "${6:sphere_pose}.position.y = ${8:y};",
+      "${6:sphere_pose}.position.z = ${9:z};",
+      "",
+      "${1:collision_object}.primitives.push_back(${4:primitive});",
+      "${1:collision_object}.primitive_poses.push_back(${6:sphere_pose});",
+      "${1:collision_object}.operation = moveit_msgs::msg::CollisionObject::ADD;",
+      "",
+      "${10:planning_scene_interface}.applyCollisionObject(${1:collision_object});",
+      "$0"
+    ],
+    "description": "MoveIt2 add sphere collision object to planning scene"
+  },
+  "MoveIt2 Add Cylinder Collision Object": {
+    "prefix": "moveit2_add_cylinder_collision",
+    "body": [
+      "moveit_msgs::msg::CollisionObject ${1:collision_object};",
+      "${1:collision_object}.header.frame_id = ${2:move_group_interface}.getPlanningFrame();",
+      "${1:collision_object}.id = \"${3:cylinder_name}\";",
+      "",
+      "shape_msgs::msg::SolidPrimitive ${4:primitive};",
+      "${4:primitive}.type = shape_msgs::msg::SolidPrimitive::CYLINDER;",
+      "${4:primitive}.dimensions.resize(2);",
+      "${4:primitive}.dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_HEIGHT] = ${5:height};",
+      "${4:primitive}.dimensions[shape_msgs::msg::SolidPrimitive::CYLINDER_RADIUS] = ${6:radius};",
+      "",
+      "geometry_msgs::msg::Pose ${7:cylinder_pose};",
+      "${7:cylinder_pose}.orientation.w = 1.0;",
+      "${7:cylinder_pose}.position.x = ${8:x};",
+      "${7:cylinder_pose}.position.y = ${9:y};",
+      "${7:cylinder_pose}.position.z = ${10:z};",
+      "",
+      "${1:collision_object}.primitives.push_back(${4:primitive});",
+      "${1:collision_object}.primitive_poses.push_back(${7:cylinder_pose});",
+      "${1:collision_object}.operation = moveit_msgs::msg::CollisionObject::ADD;",
+      "",
+      "${11:planning_scene_interface}.applyCollisionObject(${1:collision_object});",
+      "$0"
+    ],
+    "description": "MoveIt2 add cylinder collision object to planning scene"
+  },
+  "MoveIt2 Remove Collision Object": {
+    "prefix": "moveit2_remove_collision",
+    "body": [
+      "std::vector<std::string> ${1:object_ids} = {\"${2:object_name}\"};",
+      "${3:planning_scene_interface}.removeCollisionObjects(${1:object_ids});",
+      "$0"
+    ],
+    "description": "MoveIt2 remove collision object from planning scene"
+  },
+  "MoveIt2 Attach Object": {
+    "prefix": "moveit2_attach_object",
+    "body": [
+      "${1:move_group_interface}.attachObject(\"${2:object_id}\", \"${3:link_name}\");",
+      "$0"
+    ],
+    "description": "MoveIt2 attach object to robot link"
+  },
+  "MoveIt2 Detach Object": {
+    "prefix": "moveit2_detach_object",
+    "body": [
+      "${1:move_group_interface}.detachObject(\"${2:object_id}\");",
+      "$0"
+    ],
+    "description": "MoveIt2 detach object from robot"
+  },
+  "MoveIt2 Cartesian Path": {
+    "prefix": "moveit2_cartesian_path",
+    "body": [
+      "std::vector<geometry_msgs::msg::Pose> ${1:waypoints};",
+      "${1:waypoints}.push_back(${2:start_pose});",
+      "${1:waypoints}.push_back(${3:end_pose});",
+      "",
+      "moveit_msgs::msg::RobotTrajectory ${4:trajectory};",
+      "const double ${5:jump_threshold} = ${6:0.0};",
+      "const double ${7:eef_step} = ${8:0.01};",
+      "",
+      "double ${9:fraction} = ${10:move_group_interface}.computeCartesianPath(",
+      "\t${1:waypoints},",
+      "\t${7:eef_step},",
+      "\t${5:jump_threshold},",
+      "\t${4:trajectory}",
+      ");",
+      "",
+      "if (${9:fraction} >= ${11:0.9}) {",
+      "\t${10:move_group_interface}.execute(${4:trajectory});",
+      "\tRCLCPP_INFO(${12:logger}, \"Cartesian path executed: %.2f%% achieved\", ${9:fraction} * 100.0);",
+      "} else {",
+      "\tRCLCPP_WARN(${12:logger}, \"Only %.2f%% of cartesian path achieved\", ${9:fraction} * 100.0);",
+      "}",
+      "$0"
+    ],
+    "description": "MoveIt2 compute and execute cartesian path"
+  },
+  "MoveIt2 Set Planning Time": {
+    "prefix": "moveit2_set_planning_time",
+    "body": [
+      "${1:move_group_interface}.setPlanningTime(${2:10.0});",
+      "$0"
+    ],
+    "description": "MoveIt2 set planning time limit"
+  },
+  "MoveIt2 Set Velocity Scaling": {
+    "prefix": "moveit2_set_velocity_scaling",
+    "body": [
+      "${1:move_group_interface}.setMaxVelocityScalingFactor(${2:0.1});",
+      "$0"
+    ],
+    "description": "MoveIt2 set max velocity scaling factor"
+  },
+  "MoveIt2 Set Acceleration Scaling": {
+    "prefix": "moveit2_set_acceleration_scaling",
+    "body": [
+      "${1:move_group_interface}.setMaxAccelerationScalingFactor(${2:0.1});",
+      "$0"
+    ],
+    "description": "MoveIt2 set max acceleration scaling factor"
+  },
+  "MoveIt2 Set Goal Tolerance": {
+    "prefix": "moveit2_set_goal_tolerance",
+    "body": [
+      "${1:move_group_interface}.setGoalPositionTolerance(${2:0.01});",
+      "${1:move_group_interface}.setGoalOrientationTolerance(${3:0.01});",
+      "$0"
+    ],
+    "description": "MoveIt2 set goal position and orientation tolerance"
+  },
+  "MoveIt2 Set Planner ID": {
+    "prefix": "moveit2_set_planner_id",
+    "body": [
+      "${1:move_group_interface}.setPlannerId(\"${2:RRTConnect}\");",
+      "$0"
+    ],
+    "description": "MoveIt2 set planner ID (e.g., RRTConnect, PRM, EST)"
+  },
+  "MoveIt2 Get Current Pose": {
+    "prefix": "moveit2_get_current_pose",
+    "body": [
+      "geometry_msgs::msg::PoseStamped ${1:current_pose} = ${2:move_group_interface}.getCurrentPose(\"${3:end_effector_link}\");",
+      "$0"
+    ],
+    "description": "MoveIt2 get current pose of end effector"
+  },
+  "MoveIt2 Get Current Joint Values": {
+    "prefix": "moveit2_get_current_joint_values",
+    "body": [
+      "std::vector<double> ${1:joint_values} = ${2:move_group_interface}.getCurrentJointValues();",
+      "$0"
+    ],
+    "description": "MoveIt2 get current joint values"
+  },
+  "MoveIt2 Get Planning Frame": {
+    "prefix": "moveit2_get_planning_frame",
+    "body": [
+      "std::string ${1:planning_frame} = ${2:move_group_interface}.getPlanningFrame();",
+      "$0"
+    ],
+    "description": "MoveIt2 get planning frame"
+  },
+  "MoveIt2 Get End Effector Link": {
+    "prefix": "moveit2_get_end_effector_link",
+    "body": [
+      "std::string ${1:eef_link} = ${2:move_group_interface}.getEndEffectorLink();",
+      "$0"
+    ],
+    "description": "MoveIt2 get end effector link name"
+  },
+  "MoveIt2 Set End Effector Link": {
+    "prefix": "moveit2_set_end_effector_link",
+    "body": [
+      "${1:move_group_interface}.setEndEffectorLink(\"${2:link_name}\");",
+      "$0"
+    ],
+    "description": "MoveIt2 set end effector link"
+  },
+  "MoveIt2 Set Start State": {
+    "prefix": "moveit2_set_start_state",
+    "body": [
+      "${1:move_group_interface}.setStartStateToCurrentState();",
+      "$0"
+    ],
+    "description": "MoveIt2 set start state to current state"
+  },
+  "MoveIt2 Set Start State Custom": {
+    "prefix": "moveit2_set_start_state_custom",
+    "body": [
+      "moveit::core::RobotState ${1:start_state}(${2:move_group_interface}.getRobotModel());",
+      "${1:start_state}.setToDefaultValues();",
+      "${1:start_state}.setJointGroupPositions(\"${3:planning_group}\", ${4:joint_values});",
+      "${2:move_group_interface}.setStartState(${1:start_state});",
+      "$0"
+    ],
+    "description": "MoveIt2 set custom start state"
+  },
+  "MoveIt2 Clear Pose Targets": {
+    "prefix": "moveit2_clear_pose_targets",
+    "body": [
+      "${1:move_group_interface}.clearPoseTargets();",
+      "$0"
+    ],
+    "description": "MoveIt2 clear all pose targets"
+  },
+  "MoveIt2 Stop": {
+    "prefix": "moveit2_stop",
+    "body": [
+      "${1:move_group_interface}.stop();",
+      "$0"
+    ],
+    "description": "MoveIt2 stop current motion"
+  },
+  "MoveIt2 Get Random Pose": {
+    "prefix": "moveit2_get_random_pose",
+    "body": [
+      "${1:move_group_interface}.setRandomTarget();",
+      "$0"
+    ],
+    "description": "MoveIt2 set random valid pose as target"
+  },
+  "MoveIt2 Constrained Planning": {
+    "prefix": "moveit2_constrained_planning",
+    "body": [
+      "moveit_msgs::msg::Constraints ${1:constraints};",
+      "",
+      "// Position constraint",
+      "moveit_msgs::msg::PositionConstraint ${2:position_constraint};",
+      "${2:position_constraint}.header.frame_id = \"${3:base_link}\";",
+      "${2:position_constraint}.link_name = \"${4:end_effector_link}\";",
+      "",
+      "shape_msgs::msg::SolidPrimitive ${5:constraint_region};",
+      "${5:constraint_region}.type = shape_msgs::msg::SolidPrimitive::BOX;",
+      "${5:constraint_region}.dimensions = {${6:x_dim}, ${7:y_dim}, ${8:z_dim}};",
+      "",
+      "geometry_msgs::msg::Pose ${9:constraint_pose};",
+      "${9:constraint_pose}.position.x = ${10:x};",
+      "${9:constraint_pose}.position.y = ${11:y};",
+      "${9:constraint_pose}.position.z = ${12:z};",
+      "${9:constraint_pose}.orientation.w = 1.0;",
+      "",
+      "${2:position_constraint}.constraint_region.primitives.push_back(${5:constraint_region});",
+      "${2:position_constraint}.constraint_region.primitive_poses.push_back(${9:constraint_pose});",
+      "${2:position_constraint}.weight = ${13:1.0};",
+      "",
+      "${1:constraints}.position_constraints.push_back(${2:position_constraint});",
+      "${14:move_group_interface}.setPathConstraints(${1:constraints});",
+      "$0"
+    ],
+    "description": "MoveIt2 set path constraints for planning"
+  },
+  "MoveIt2 Orientation Constraint": {
+    "prefix": "moveit2_orientation_constraint",
+    "body": [
+      "moveit_msgs::msg::OrientationConstraint ${1:orientation_constraint};",
+      "${1:orientation_constraint}.header.frame_id = \"${2:base_link}\";",
+      "${1:orientation_constraint}.link_name = \"${3:end_effector_link}\";",
+      "${1:orientation_constraint}.orientation.w = ${4:1.0};",
+      "${1:orientation_constraint}.absolute_x_axis_tolerance = ${5:0.1};",
+      "${1:orientation_constraint}.absolute_y_axis_tolerance = ${6:0.1};",
+      "${1:orientation_constraint}.absolute_z_axis_tolerance = ${7:0.1};",
+      "${1:orientation_constraint}.weight = ${8:1.0};",
+      "",
+      "${9:constraints}.orientation_constraints.push_back(${1:orientation_constraint});",
+      "$0"
+    ],
+    "description": "MoveIt2 orientation constraint"
+  },
+  "MoveIt2 Clear Path Constraints": {
+    "prefix": "moveit2_clear_constraints",
+    "body": [
+      "${1:move_group_interface}.clearPathConstraints();",
+      "$0"
+    ],
+    "description": "MoveIt2 clear path constraints"
+  },
+  "MoveIt2 Multi-DOF Joint Trajectory": {
+    "prefix": "moveit2_multi_dof_trajectory",
+    "body": [
+      "trajectory_msgs::msg::MultiDOFJointTrajectory ${1:trajectory};",
+      "${1:trajectory}.header.stamp = ${2:node}->now();",
+      "${1:trajectory}.joint_names.push_back(\"${3:joint_name}\");",
+      "",
+      "trajectory_msgs::msg::MultiDOFJointTrajectoryPoint ${4:point};",
+      "geometry_msgs::msg::Transform ${5:transform};",
+      "${5:transform}.translation.x = ${6:x};",
+      "${5:transform}.translation.y = ${7:y};",
+      "${5:transform}.translation.z = ${8:z};",
+      "${5:transform}.rotation.w = ${9:1.0};",
+      "",
+      "${4:point}.transforms.push_back(${5:transform});",
+      "${4:point}.time_from_start = rclcpp::Duration(${10:1.0});",
+      "${1:trajectory}.points.push_back(${4:point});",
+      "$0"
+    ],
+    "description": "MoveIt2 multi-DOF joint trajectory"
+  },
+  "MoveIt2 Allow Collision": {
+    "prefix": "moveit2_allow_collision",
+    "body": [
+      "moveit_msgs::msg::AllowedCollisionMatrix ${1:acm};",
+      "${1:acm}.entry_names.push_back(\"${2:object_1}\");",
+      "${1:acm}.entry_names.push_back(\"${3:object_2}\");",
+      "${1:acm}.entry_values.resize(2);",
+      "${1:acm}.entry_values[0].enabled.push_back(true);",
+      "${1:acm}.entry_values[1].enabled.push_back(true);",
+      "$0"
+    ],
+    "description": "MoveIt2 allow collision between objects"
+  },
+  "MoveIt2 RobotState": {
+    "prefix": "moveit2_robot_state",
+    "body": [
+      "moveit::core::RobotState ${1:robot_state}(${2:move_group_interface}.getRobotModel());",
+      "${1:robot_state}.setToDefaultValues();",
+      "$0"
+    ],
+    "description": "MoveIt2 create robot state"
+  },
+  "MoveIt2 Forward Kinematics": {
+    "prefix": "moveit2_forward_kinematics",
+    "body": [
+      "const moveit::core::JointModelGroup* ${1:joint_model_group} = ",
+      "\t${2:robot_state}.getJointModelGroup(\"${3:planning_group}\");",
+      "",
+      "std::vector<double> ${4:joint_values} = {${5:values}};",
+      "${2:robot_state}.setJointGroupPositions(${1:joint_model_group}, ${4:joint_values});",
+      "",
+      "const Eigen::Isometry3d& ${6:end_effector_state} = ",
+      "\t${2:robot_state}.getGlobalLinkTransform(\"${7:end_effector_link}\");",
+      "",
+      "RCLCPP_INFO(${8:logger}, \"Translation: [%.3f, %.3f, %.3f]\",",
+      "\t${6:end_effector_state}.translation().x(),",
+      "\t${6:end_effector_state}.translation().y(),",
+      "\t${6:end_effector_state}.translation().z());",
+      "$0"
+    ],
+    "description": "MoveIt2 compute forward kinematics"
+  },
+  "MoveIt2 Inverse Kinematics": {
+    "prefix": "moveit2_inverse_kinematics",
+    "body": [
+      "const moveit::core::JointModelGroup* ${1:joint_model_group} = ",
+      "\t${2:robot_state}.getJointModelGroup(\"${3:planning_group}\");",
+      "",
+      "geometry_msgs::msg::Pose ${4:target_pose};",
+      "${4:target_pose}.position.x = ${5:x};",
+      "${4:target_pose}.position.y = ${6:y};",
+      "${4:target_pose}.position.z = ${7:z};",
+      "${4:target_pose}.orientation.w = ${8:1.0};",
+      "",
+      "Eigen::Isometry3d ${9:target_transform};",
+      "${9:target_transform}.translation() = Eigen::Vector3d(${5:x}, ${6:y}, ${7:z});",
+      "${9:target_transform}.linear() = Eigen::Quaterniond(${8:1.0}, 0, 0, 0).toRotationMatrix();",
+      "",
+      "bool ${10:found_ik} = ${2:robot_state}.setFromIK(",
+      "\t${1:joint_model_group},",
+      "\t${9:target_transform},",
+      "\t${11:10.0}",
+      ");",
+      "",
+      "if (${10:found_ik}) {",
+      "\tstd::vector<double> ${12:joint_values};",
+      "\t${2:robot_state}.copyJointGroupPositions(${1:joint_model_group}, ${12:joint_values});",
+      "\tRCLCPP_INFO(${13:logger}, \"IK solution found\");",
+      "} else {",
+      "\tRCLCPP_ERROR(${13:logger}, \"IK solution not found\");",
+      "}",
+      "$0"
+    ],
+    "description": "MoveIt2 compute inverse kinematics"
+  },
+  "MoveIt2 Check Collision": {
+    "prefix": "moveit2_check_collision",
+    "body": [
+      "collision_detection::CollisionRequest ${1:collision_request};",
+      "collision_detection::CollisionResult ${2:collision_result};",
+      "",
+      "${1:collision_request}.contacts = true;",
+      "${1:collision_request}.max_contacts = ${3:100};",
+      "",
+      "planning_scene::PlanningScenePtr ${4:planning_scene} = ",
+      "\tstd::make_shared<planning_scene::PlanningScene>(${5:move_group_interface}.getRobotModel());",
+      "",
+      "${4:planning_scene}->checkCollision(${1:collision_request}, ${2:collision_result}, ${6:robot_state});",
+      "",
+      "if (${2:collision_result}.collision) {",
+      "\tRCLCPP_ERROR(${7:logger}, \"Collision detected\");",
+      "} else {",
+      "\tRCLCPP_INFO(${7:logger}, \"No collision\");",
+      "}",
+      "$0"
+    ],
+    "description": "MoveIt2 check collision"
+  },
+  "MoveIt2 Self Collision Check": {
+    "prefix": "moveit2_self_collision_check",
+    "body": [
+      "collision_detection::CollisionRequest ${1:collision_request};",
+      "collision_detection::CollisionResult ${2:collision_result};",
+      "",
+      "${1:collision_request}.group_name = \"${3:planning_group}\";",
+      "",
+      "${4:robot_state}.updateCollisionBodyTransforms();",
+      "${4:robot_state}.checkSelfCollision(${1:collision_request}, ${2:collision_result});",
+      "",
+      "if (${2:collision_result}.collision) {",
+      "\tRCLCPP_WARN(${5:logger}, \"Self collision detected\");",
+      "} else {",
+      "\tRCLCPP_INFO(${5:logger}, \"No self collision\");",
+      "}",
+      "$0"
+    ],
+    "description": "MoveIt2 check self collision"
+  },
+  "MoveIt2 Get Jacobian": {
+    "prefix": "moveit2_get_jacobian",
+    "body": [
+      "const moveit::core::JointModelGroup* ${1:joint_model_group} = ",
+      "\t${2:robot_state}.getJointModelGroup(\"${3:planning_group}\");",
+      "",
+      "Eigen::Vector3d ${4:reference_point}(${5:0.0}, ${6:0.0}, ${7:0.0});",
+      "",
+      "Eigen::MatrixXd ${8:jacobian};",
+      "${2:robot_state}.getJacobian(",
+      "\t${1:joint_model_group},",
+      "\t${2:robot_state}.getLinkModel(\"${9:end_effector_link}\"),",
+      "\t${4:reference_point},",
+      "\t${8:jacobian}",
+      ");",
+      "",
+      "RCLCPP_INFO(${10:logger}, \"Jacobian size: %ld x %ld\", ${8:jacobian}.rows(), ${8:jacobian}.cols());",
+      "$0"
+    ],
+    "description": "MoveIt2 get Jacobian matrix"
+  },
+  "MoveIt2 Apply Planning Scene": {
+    "prefix": "moveit2_apply_planning_scene",
+    "body": [
+      "moveit_msgs::msg::PlanningScene ${1:planning_scene_msg};",
+      "${1:planning_scene_msg}.robot_state.is_diff = true;",
+      "${1:planning_scene_msg}.is_diff = true;",
+      "",
+      "${2:planning_scene_interface}.applyPlanningScene(${1:planning_scene_msg});",
+      "$0"
+    ],
+    "description": "MoveIt2 apply planning scene"
+  },
+  "MoveIt2 Trajectory Smoothing": {
+    "prefix": "moveit2_trajectory_smoothing",
+    "body": [
+      "robot_trajectory::RobotTrajectory ${1:robot_trajectory}(",
+      "\t${2:move_group_interface}.getRobotModel(),",
+      "\t\"${3:planning_group}\"",
+      ");",
+      "",
+      "trajectory_processing::TimeOptimalTrajectoryGeneration ${4:time_param};",
+      "${4:time_param}.computeTimeStamps(",
+      "\t${1:robot_trajectory},",
+      "\t${5:max_velocity_scaling_factor},",
+      "\t${6:max_acceleration_scaling_factor}",
+      ");",
+      "$0"
+    ],
+    "description": "MoveIt2 trajectory time parameterization and smoothing"
+  },
+  "MoveIt2 Pick": {
+    "prefix": "moveit2_pick",
+    "body": [
+      "moveit_msgs::msg::Grasp ${1:grasp};",
+      "${1:grasp}.grasp_pose.header.frame_id = \"${2:base_link}\";",
+      "${1:grasp}.grasp_pose.pose.position.x = ${3:x};",
+      "${1:grasp}.grasp_pose.pose.position.y = ${4:y};",
+      "${1:grasp}.grasp_pose.pose.position.z = ${5:z};",
+      "${1:grasp}.grasp_pose.pose.orientation.w = ${6:1.0};",
+      "",
+      "${1:grasp}.pre_grasp_approach.direction.header.frame_id = \"${2:base_link}\";",
+      "${1:grasp}.pre_grasp_approach.direction.vector.z = ${7:-1.0};",
+      "${1:grasp}.pre_grasp_approach.min_distance = ${8:0.05};",
+      "${1:grasp}.pre_grasp_approach.desired_distance = ${9:0.1};",
+      "",
+      "${1:grasp}.post_grasp_retreat.direction.header.frame_id = \"${2:base_link}\";",
+      "${1:grasp}.post_grasp_retreat.direction.vector.z = ${10:1.0};",
+      "${1:grasp}.post_grasp_retreat.min_distance = ${11:0.05};",
+      "${1:grasp}.post_grasp_retreat.desired_distance = ${12:0.1};",
+      "",
+      "std::vector<moveit_msgs::msg::Grasp> ${13:grasps};",
+      "${13:grasps}.push_back(${1:grasp});",
+      "",
+      "${14:move_group_interface}.pick(\"${15:object_name}\", ${13:grasps});",
+      "$0"
+    ],
+    "description": "MoveIt2 pick object"
+  },
+  "MoveIt2 Place": {
+    "prefix": "moveit2_place",
+    "body": [
+      "moveit_msgs::msg::PlaceLocation ${1:place_location};",
+      "${1:place_location}.place_pose.header.frame_id = \"${2:base_link}\";",
+      "${1:place_location}.place_pose.pose.position.x = ${3:x};",
+      "${1:place_location}.place_pose.pose.position.y = ${4:y};",
+      "${1:place_location}.place_pose.pose.position.z = ${5:z};",
+      "${1:place_location}.place_pose.pose.orientation.w = ${6:1.0};",
+      "",
+      "${1:place_location}.pre_place_approach.direction.header.frame_id = \"${2:base_link}\";",
+      "${1:place_location}.pre_place_approach.direction.vector.z = ${7:-1.0};",
+      "${1:place_location}.pre_place_approach.min_distance = ${8:0.05};",
+      "${1:place_location}.pre_place_approach.desired_distance = ${9:0.1};",
+      "",
+      "${1:place_location}.post_place_retreat.direction.header.frame_id = \"${2:base_link}\";",
+      "${1:place_location}.post_place_retreat.direction.vector.z = ${10:1.0};",
+      "${1:place_location}.post_place_retreat.min_distance = ${11:0.05};",
+      "${1:place_location}.post_place_retreat.desired_distance = ${12:0.1};",
+      "",
+      "std::vector<moveit_msgs::msg::PlaceLocation> ${13:place_locations};",
+      "${13:place_locations}.push_back(${1:place_location});",
+      "",
+      "${14:move_group_interface}.place(\"${15:object_name}\", ${13:place_locations});",
+      "$0"
+    ],
+    "description": "MoveIt2 place object"
+  },
+  "MoveIt2 Get Joint Limits": {
+    "prefix": "moveit2_get_joint_limits",
+    "body": [
+      "const moveit::core::JointModelGroup* ${1:joint_model_group} = ",
+      "\t${2:robot_state}.getJointModelGroup(\"${3:planning_group}\");",
+      "",
+      "const std::vector<const moveit::core::JointModel*>& ${4:joint_models} = ",
+      "\t${1:joint_model_group}->getActiveJointModels();",
+      "",
+      "for (const auto* ${5:joint} : ${4:joint_models}) {",
+      "\tconst moveit::core::JointModel::Bounds& ${6:bounds} = ${5:joint}->getVariableBounds();",
+      "\tfor (size_t i = 0; i < ${6:bounds}.size(); ++i) {",
+      "\t\tRCLCPP_INFO(${7:logger}, \"Joint: %s, Min: %.3f, Max: %.3f\",",
+      "\t\t\t${5:joint}->getName().c_str(),",
+      "\t\t\t${6:bounds}[i].min_position_,",
+      "\t\t\t${6:bounds}[i].max_position_);",
+      "\t}",
+      "}",
+      "$0"
+    ],
+    "description": "MoveIt2 get joint limits"
+  },
+  "MoveIt2 Set Workspace": {
+    "prefix": "moveit2_set_workspace",
+    "body": [
+      "${1:move_group_interface}.setWorkspace(",
+      "\t${2:min_x}, ${3:min_y}, ${4:min_z},",
+      "\t${5:max_x}, ${6:max_y}, ${7:max_z}",
+      ");",
+      "$0"
+    ],
+    "description": "MoveIt2 set workspace bounds"
+  },
+  "MoveIt2 Async Plan": {
+    "prefix": "moveit2_async_plan",
+    "body": [
+      "auto ${1:future} = std::async(std::launch::async, [&]() {",
+      "\tmoveit::planning_interface::MoveGroupInterface::Plan ${2:plan};",
+      "\tbool ${3:success} = (${4:move_group_interface}.plan(${2:plan}) == moveit::core::MoveItErrorCode::SUCCESS);",
+      "\treturn std::make_pair(${3:success}, ${2:plan});",
+      "});",
+      "",
+      "// Wait for result",
+      "auto [${3:success}, ${2:plan}] = ${1:future}.get();",
+      "",
+      "if (${3:success}) {",
+      "\t${4:move_group_interface}.execute(${2:plan});",
+      "}",
+      "$0"
+    ],
+    "description": "MoveIt2 asynchronous planning"
+  },
+  "MoveIt2 Move Group Action Client": {
+    "prefix": "moveit2_action_client",
+    "body": [
+      "using MoveGroupAction = moveit_msgs::action::MoveGroup;",
+      "using GoalHandleMoveGroup = rclcpp_action::ClientGoalHandle<MoveGroupAction>;",
+      "",
+      "auto ${1:action_client} = rclcpp_action::create_client<MoveGroupAction>(",
+      "\t${2:node},",
+      "\t\"move_action\"",
+      ");",
+      "",
+      "if (!${1:action_client}->wait_for_action_server(std::chrono::seconds(${3:10}))) {",
+      "\tRCLCPP_ERROR(${4:logger}, \"Action server not available\");",
+      "\treturn;",
+      "}",
+      "",
+      "auto ${5:goal_msg} = MoveGroupAction::Goal();",
+      "${5:goal_msg}.request.group_name = \"${6:planning_group}\";",
+      "",
+      "auto ${7:send_goal_options} = rclcpp_action::Client<MoveGroupAction>::SendGoalOptions();",
+      "${7:send_goal_options}.result_callback = ",
+      "\t[](const GoalHandleMoveGroup::WrappedResult& result) {",
+      "\t\tif (result.code == rclcpp_action::ResultCode::SUCCEEDED) {",
+      "\t\t\tRCLCPP_INFO(rclcpp::get_logger(\"moveit2\"), \"Goal succeeded\");",
+      "\t\t}",
+      "\t};",
+      "",
+      "${1:action_client}->async_send_goal(${5:goal_msg}, ${7:send_goal_options});",
+      "$0"
+    ],
+    "description": "MoveIt2 action client for move group"
+  },
+  "MoveIt2 Execute Trajectory Service": {
+    "prefix": "moveit2_execute_trajectory_service",
+    "body": [
+      "auto ${1:execute_client} = ${2:node}->create_client<moveit_msgs::srv::ExecuteKnownTrajectory>(",
+      "\t\"execute_trajectory\"",
+      ");",
+      "",
+      "auto ${3:request} = std::make_shared<moveit_msgs::srv::ExecuteKnownTrajectory::Request>();",
+      "${3:request}->trajectory = ${4:trajectory};",
+      "${3:request}->wait_for_execution = ${5:true};",
+      "",
+      "auto ${6:future} = ${1:execute_client}->async_send_request(${3:request});",
+      "",
+      "if (rclcpp::spin_until_future_complete(${2:node}, ${6:future}) == rclcpp::FutureReturnCode::SUCCESS) {",
+      "\tauto ${7:response} = ${6:future}.get();",
+      "\tif (${7:response}->error_code.val == moveit_msgs::msg::MoveItErrorCodes::SUCCESS) {",
+      "\t\tRCLCPP_INFO(${8:logger}, \"Trajectory executed successfully\");",
+      "\t}",
+      "}",
+      "$0"
+    ],
+    "description": "MoveIt2 execute trajectory service call"
+  },
+  "MoveIt2 RobotModel Loader": {
+    "prefix": "moveit2_robot_model_loader",
+    "body": [
+      "robot_model_loader::RobotModelLoader ${1:robot_model_loader}(${2:node});",
+      "moveit::core::RobotModelPtr ${3:kinematic_model} = ${1:robot_model_loader}.getModel();",
+      "",
+      "RCLCPP_INFO(${4:logger}, \"Model frame: %s\", ${3:kinematic_model}->getModelFrame().c_str());",
+      "$0"
+    ],
+    "description": "MoveIt2 robot model loader"
+  },
+  "MoveIt2 Servo": {
+    "prefix": "moveit2_servo",
+    "body": [
+      "auto ${1:servo_params} = moveit_servo::ServoParameters::makeServoParameters(${2:node});",
+      "if (!${1:servo_params}) {",
+      "\tRCLCPP_ERROR(${3:logger}, \"Failed to load servo parameters\");",
+      "\treturn;",
+      "}",
+      "",
+      "auto ${4:planning_scene_monitor} = std::make_shared<planning_scene_monitor::PlanningSceneMonitor>(",
+      "\t${2:node}, \"robot_description\"",
+      ");",
+      "",
+      "auto ${5:servo} = std::make_unique<moveit_servo::Servo>(",
+      "\t${2:node},",
+      "\t${1:servo_params},",
+      "\t${4:planning_scene_monitor}",
+      ");",
+      "",
+      "${5:servo}->start();",
+      "$0"
+    ],
+    "description": "MoveIt2 servo real-time control"
+  },
+  "MoveIt2 Pilz Industrial Motion": {
+    "prefix": "moveit2_pilz_lin",
+    "body": [
+      "${1:move_group_interface}.setPlannerId(\"LIN\");",
+      "${1:move_group_interface}.setMaxVelocityScalingFactor(${2:0.1});",
+      "${1:move_group_interface}.setMaxAccelerationScalingFactor(${3:0.1});",
+      "$0"
+    ],
+    "description": "MoveIt2 Pilz industrial motion planner (LIN)"
+  },
+  "MoveIt2 Pilz PTP": {
+    "prefix": "moveit2_pilz_ptp",
+    "body": [
+      "${1:move_group_interface}.setPlannerId(\"PTP\");",
+      "${1:move_group_interface}.setMaxVelocityScalingFactor(${2:0.1});",
+      "${1:move_group_interface}.setMaxAccelerationScalingFactor(${3:0.1});",
+      "$0"
+    ],
+    "description": "MoveIt2 Pilz point-to-point planner"
+  },
+  "MoveIt2 Pilz CIRC": {
+    "prefix": "moveit2_pilz_circ",
+    "body": [
+      "${1:move_group_interface}.setPlannerId(\"CIRC\");",
+      "",
+      "geometry_msgs::msg::Pose ${2:center_pose};",
+      "${2:center_pose}.position.x = ${3:x};",
+      "${2:center_pose}.position.y = ${4:y};",
+      "${2:center_pose}.position.z = ${5:z};",
+      "${2:center_pose}.orientation.w = ${6:1.0};",
+      "",
+      "// Set as path constraint for circular motion",
+      "${1:move_group_interface}.setMaxVelocityScalingFactor(${7:0.1});",
+      "$0"
+    ],
+    "description": "MoveIt2 Pilz circular motion planner"
+  },
+  "MoveIt2 Get All Collision Objects": {
+    "prefix": "moveit2_get_collision_objects",
+    "body": [
+      "std::map<std::string, moveit_msgs::msg::CollisionObject> ${1:collision_objects} = ",
+      "\t${2:planning_scene_interface}.getObjects();",
+      "",
+      "for (const auto& [${3:name}, ${4:object}] : ${1:collision_objects}) {",
+      "\tRCLCPP_INFO(${5:logger}, \"Object: %s\", ${3:name}.c_str());",
+      "}",
+      "$0"
+    ],
+    "description": "MoveIt2 get all collision objects in scene"
+  },
+  "MoveIt2 Retime Trajectory": {
+    "prefix": "moveit2_retime_trajectory",
+    "body": [
+      "robot_trajectory::RobotTrajectory ${1:robot_trajectory}(",
+      "\t${2:move_group_interface}.getRobotModel(),",
+      "\t\"${3:planning_group}\"",
+      ");",
+      "",
+      "${1:robot_trajectory}.setRobotTrajectoryMsg(${4:robot_state}, ${5:trajectory_msg});",
+      "",
+      "trajectory_processing::IterativeParabolicTimeParameterization ${6:time_param};",
+      "${6:time_param}.computeTimeStamps(",
+      "\t${1:robot_trajectory},",
+      "\t${7:max_velocity_scaling_factor},",
+      "\t${8:max_acceleration_scaling_factor}",
+      ");",
+      "",
+      "moveit_msgs::msg::RobotTrajectory ${9:retimed_trajectory};",
+      "${1:robot_trajectory}.getRobotTrajectoryMsg(${9:retimed_trajectory});",
+      "$0"
+    ],
+    "description": "MoveIt2 retime trajectory with time parameterization"
+  }
+}

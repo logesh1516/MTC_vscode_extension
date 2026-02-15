@@ -1,0 +1,36 @@
+{
+  "Ros2 ParamListener": {
+    "prefix": "ros2_paramlistener",
+    "body": [
+      "const auto ${1:param_listener} = std::make_shared<${2:paramter_name}::ParamListener>(node);",
+      "const auto ${3:params} = ${1:param_listener}->get_params();",
+      "$0"
+    ],
+    "description": "Paramter listener"
+  },
+  "Ros2 SingleExecutor": {
+    "prefix": "ros2_single_executor",
+    "body": [
+      "rclcpp::executors::SingleThreadedExecutor ${1:executor};",
+      "${1:executor}.add_node(${2:node});",
+      "auto ${3:spinner} = std::thread([&${1:executor}] { ${1:executor}.spin(); });",
+      "",
+      "${4}",
+      "spinner.join();",
+      "rclcpp::shutdown();",
+      "$0"
+    ],
+    "description": "SingleExecutor"
+  },
+  "Ros2 Transformation Matrix": {
+    "prefix": "ros2_transformation_matrix",
+    "body": [
+      "Eigen::Translation3d(${1},${2},${3}) *",
+      "Eigen::AngleAxisd(${4}, Eigen::Vector3d::UnitX()) *",
+      "Eigen::AngleAxisd(${5}, Eigen::Vector3d::UnitY()) *",
+      "Eigen::AngleAxisd(${6}, Eigen::Vector3d::UnitZ())",
+      "$0"
+    ],
+    "description": "ros2_transformation_matrix"
+  }
+}

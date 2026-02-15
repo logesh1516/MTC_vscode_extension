@@ -21,7 +21,15 @@
     "snippets": [
       {
         "language": "cpp",
-        "path": "./snippets/snippets.code-snippets"
+        "path": "./snippets/mtc.code-snippets"
+      },
+      {
+        "language": "cpp",
+        "path": "./snippets/ros2.code-snippets"
+      },
+      {
+        "language": "cpp",
+        "path": "./snippets/moveit2.code-snippets"
       }
     ]
   }
