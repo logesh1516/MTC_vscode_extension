@@ -4,7 +4,11 @@
   "description": "snippets for moveit2 and moveit task constructor",
   "version": "0.0.1",
   "icon": "images/icon.png",
-  "publisher": "logesh1516",
+  "publisher": "LogeshS",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/logesh1516/MTC_vscode_extension.git"
+  },
   "keywords": [
     "moveit",
     "moveit2",
